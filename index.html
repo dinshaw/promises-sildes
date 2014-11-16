@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="css/reveal-ck.css">
 
 <link rel="stylesheet" href="css/promise.css">
+<link rel="stylesheet" href="css/title-footer.css">
 
 <!-- If the query includes 'print-pdf', use the PDF print sheet -->
 <script>
@@ -56,7 +57,6 @@
 
 </section>
 <section>
-<section>
 
 <h2>Promises, eh?</h2>
 
@@ -71,30 +71,32 @@
 <p><a href="https://github.com/lgierth/promise.rb">github.com/lgierth/promise.rb</a></p>
 
 </section>
-</section>
+<section>
 <section>
 
 <h3>Getting cat pics with JS</h3>
-<pre><code class="js">getCat("Garfield", function(err, cat) {
-  if (err) {
-    getCatError(err)
-  } else {
-    getCatPics(cat, function(err, pics) {
-      if (err) {
-        getCatPicsError(err)
-      } else {
-        showCatPic(pics)
-...
+<pre><code class="js">  getCat("Garfield", function(err, cat) {
+    if (err) {
+      getCatError(err)
+    } else {
+      getCatPics(cat, function(err, pics) {
+        if (err) {
+          getCatPicsError(err)
+        } else {
+          showCatPic(pics)
+  ...
 </code></pre>
 </section>
 <section>
 
 <h3>Getting cat pics with a Promise</h3>
-<pre><code class="js">getCat("Garfield")
-  .then(getCatPics, getCatError)
-  .then(showCatPic, getCatPicsError)
+<pre><code class="js">1|  getCat("Garfield")
+2|    .then(getCatPics, getCatError)
+3|    .then(showCatPic, getCatPicsError)
 </code></pre>
 </section>
+</section>
+
 <section>
 <section>
 
@@ -113,10 +115,9 @@
 <section>
 
 <h2>Ruby Promise</h2>
-<pre><code class="ruby">  get_cat('Garfield').
-    then(get_cat_pics, handle_get_cat_error).
-    then(show_cat_pic, handle_get_cat_pics_error)
-
+<pre><code class="ruby">1|    get_cat('Garfield').
+2|      then(get_cat_pics, handle_get_cat_error).
+3|      then(show_cat_pic, handle_get_cat_pics_error)
 </code></pre>
 <p><a href="http://awaxman11.github.io/blog/2013/08/05/what-is-the-difference-between-a-block/">Block, Proc, and Lambda</a></p>
 
@@ -124,10 +125,9 @@
 <section>
 
 <h2>Ruby Promise</h2>
-<pre><code class="ruby">  Promise.start(Cat.get('Garfield')).
-    then(get_cat_pics, handle_get_cat_error).
-    then(show_cat_pic, handle_get_cat_pics_error)
-
+<pre><code class="ruby"> 1|  Promise.start(Cat.get('Garfield')).
+ 2|    then(get_cat_pics, handle_get_cat_error).
+ 3|    then(show_cat_pic, handle_get_cat_pics_error)
 </code></pre>
 </section>
 </section>
@@ -137,18 +137,17 @@
 
 </section>
 <section>
-<section>
 
 <h2>Fulfill and Reject</h2>
-<pre><code class="ruby">    Promise.new { |fulfill, reject|
-      if my_method?
-        fulfill.call my_instance.value
-      else
-        reject.call my_instance.error
-      end
-    }
+<pre><code class="ruby">  Promise.new { |fulfill, reject|
+    cat = get_cat_pick
+    if cat.has_pics?
+      fulfill.call cat.pics
+    else
+      reject.call cat
+    end
+  }
 </code></pre>
-</section>
 </section>
 <section>
 
@@ -161,11 +160,9 @@
     rescue Exception =&gt; e
       reject(e)
     end
-
   end
 </code></pre>
 </section>
-<section>
 <section>
 
 <h2>All</h2>
@@ -173,8 +170,15 @@
     Promise.new do |fulfill, reject|
       results = []
       on_success = -&gt;(result) do
-        results </code></pre>
-</section>
+        results &lt;&lt; result
+        if results.size == promises.size
+          fulfill.call(results)
+        end
+      end
+      promises.each do |promise|
+        promise.then(on_success, reject)
+      end; end; end
+</code></pre>
 </section>
 <section>
 
@@ -188,12 +192,9 @@
       end
       promises.each do |promise|
         promise.then(fulfill, on_error)
-      end
-    end
-  end
+      end; end; end
 </code></pre>
 </section>
-<section>
 <section>
 
 <h2>Promises Recap</h2>
@@ -204,7 +205,8 @@
 
 <p class="fragment">* Chainable / "thenable"</p>
 
-</section>
+<p>Wouldn't it be nice to see these flows the way we think about them? - Mike Davis</p>
+
 </section>
 <section>
 
@@ -213,7 +215,6 @@
 <p><a href="github.com/dinshaw/promises">github.com/dinshaw/promises</a></p>
 
 </section>
-<section>
 <section>
 
 <h2>Thanks!</h2>
@@ -224,15 +225,9 @@
 
 <p>Jed Northbridge for his <a href="https://github.com/jedcn/reveal-ck">Reavel-CK</a> gem that I used to make this presentation.</p>
 
-</section>
-</section>
-<section>
+<p>Constant Contact for sending me here.</p>
 
-<h2>Thoughts</h2>
-
-<ul>
-<li>EM</li>
-</ul>
+<h3>Questions?</h3>
 
 </section>
 
@@ -260,7 +255,7 @@
       { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
     ]
   };
-  var configOptions = {"controls":true,"progress":true,"history":true,"center":true}
+  var configOptions = {"dependencies":[{"src":"plugin/title-footer/title-footer.js","async":true,"callback":"function() { title_footer.initialize('github.com/dinshaw/promise','rgba(255,255,255,0.1)'); }"}]}
   var initializeOptions = {};
   extend(initializeOptions, baseOptions);
   extend(initializeOptions, configOptions);
