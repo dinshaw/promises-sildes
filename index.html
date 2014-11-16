@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
 
-<title>Slides</title>
+<title>Promises in Ruby</title>
 
 <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
-<meta name="author" content="">
+<meta name="author" content="Dinshaw Gobhai">
 
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -43,32 +43,30 @@
 
 <h2>i <img class="emoji" title=":heart:" alt=":heart:" src="https://assets-cdn.github.com/images/icons/emoji/heart.png" align="absmiddle"> Promises in Ruby</h2>
 
-<p>Promises we can keep.</p>
-
-<p>"I promise that there will be no cat pics."</p>
+<p>No cat pics, I promise.</p>
 
 <p>Dinshaw Gobhai | <a href="mailto:dgobhai@constantcontact.com">dgobhai@constantcontact.com</a></p>
 
-<p><a href="https://github.com/tallfriend" class="user-mention">@tallfriend</a></p>
+<p>Twitter :  <a href="https://twitter.com/tallfriend" class="user-mention">@tallfriend</a></p>
 
-<p><a href="github.com/dinshaw/promises-in-ruby">github.com/dinshaw/promises-in-ruby</a></p>
+<p>Slides : <a href="http://dinshaw.github.io/promises-sildes">github.com/dinshaw/promises-in-ruby</a></p>
 
-<p><a href="github.com/dinshaw/promises">github.com/dinshaw/promises</a></p>
+<p>Code : <a href="http://github.com/dinshaw/promises">github.com/dinshaw/promises</a></p>
 
 </section>
 <section>
 
 <h2>Promises, eh?</h2>
 
-<p>"direct correspondence between synchronous and asynchronous functions"</p>
+<blockquote>
+<p>direct correspondence between synchronous and asynchronous functions</p>
+</blockquote>
 
 <p><a href="https://www.youtube.com/watch?v=V2Q13hzTGmA">Callbacks, Promises, and Coroutines</a> - Domenic Denicola</p>
 
 <p><a href="https://blog.domenic.me/youre-missing-the-point-of-promises/">You’re missing the point of Promises</a> - Domenic Denicola</p>
 
 <p><a href="https://promisesaplus.com/">Promises/A+</a> - Lots of very smart people</p>
-
-<p><a href="https://github.com/lgierth/promise.rb">github.com/lgierth/promise.rb</a></p>
 
 </section>
 <section>
@@ -119,7 +117,7 @@
 2|      then(get_cat_pics, handle_get_cat_error).
 3|      then(show_cat_pic, handle_get_cat_pics_error)
 </code></pre>
-<p><a href="http://awaxman11.github.io/blog/2013/08/05/what-is-the-difference-between-a-block/">Block, Proc, and Lambda</a></p>
+<p><a href="http://awaxman11.github.io/blog/2013/08/05/what-is-the-difference-between-a-block/">Block, Proc, and Lambda</a> - Adam Waxman</p>
 
 </section>
 <section>
@@ -140,11 +138,11 @@
 
 <h2>Fulfill and Reject</h2>
 <pre><code class="ruby">  Promise.new { |fulfill, reject|
-    cat = get_cat_pick
-    if cat.has_pics?
-      fulfill.call cat.pics
+    cat_pics = get_cat_pics
+    if cat_pics.size &gt; 0
+      fulfill.call cat_pics
     else
-      reject.call cat
+      reject.call 'No cat pics!'
     end
   }
 </code></pre>
@@ -152,60 +150,67 @@
 <section>
 
 <h2>Initialize</h2>
-<pre><code class="ruby">  def initialize
-    @state = :pending
-    @value = nil
-    begin
-      yield method(:fulfill), method(:reject)
-    rescue Exception =&gt; e
-      reject(e)
-    end
-  end
+<pre><code class="ruby">1|  def initialize
+2|    @state = :pending
+3|    @value = nil
+4|    begin
+5|      yield method(:fulfill), method(:reject)
+6|    rescue Exception =&gt; e
+7|      reject(e)
+8|    end
+9|  end
 </code></pre>
 </section>
 <section>
 
+<h2>More code</h2>
+
+</section>
+<section>
+
 <h2>All</h2>
-<pre><code class="ruby">  def self.all(*promises)
-    Promise.new do |fulfill, reject|
-      results = []
-      on_success = -&gt;(result) do
-        results &lt;&lt; result
-        if results.size == promises.size
-          fulfill.call(results)
-        end
-      end
-      promises.each do |promise|
-        promise.then(on_success, reject)
-      end; end; end
+<pre><code class="ruby">1 |  def self.all(promises)
+2 |    Promise.new do |fulfill, reject|
+3 |      results = []
+4 |      on_success = -&gt;(result) do
+5 |        results &lt;&lt; result
+6 |        if results.size == promises.size
+7 |          fulfill.call(results)
+8 |        end
+9 |      end
+10|      promises.each do |promise|
+11|        promise.then(on_success, reject)
+12|      end; end; end
 </code></pre>
 </section>
 <section>
 
 <h2>Any</h2>
-<pre><code class="ruby">  def self.any(*promises)
-    Promise.new do |fulfill, reject|
-      count = promises.size
-      on_error = -&gt;(*) do
-        count -= 1
-        reject.call if count == 0
-      end
-      promises.each do |promise|
-        promise.then(fulfill, on_error)
-      end; end; end
+<pre><code class="ruby">1 |  def self.any(promises)
+2 |    Promise.new do |fulfill, reject|
+3 |      count = promises.size
+4 |      on_error = -&gt;(*) do
+5 |        count -= 1
+6 |        reject.call if count == 0
+7 |      end
+8 |      promises.each do |promise|
+9 |        promise.then(fulfill, on_error)
+10|      end; end; end
 </code></pre>
 </section>
 <section>
 
 <h2>Promises Recap</h2>
 
+<blockquote>
+  Wouldn't it be nice to see these flows the way we think about them? - <a href="https://twitter.com/mcdavis" class="user-mention">@mcdavis</a>
+</blockquote>
+
 <p class="fragment">* Return a promise, immediately</p>
 
 <p class="fragment">* Fulfills or Rejects</p>
 
 <p class="fragment">* Chainable / "thenable"</p>
-
-<p>Wouldn't it be nice to see these flows the way we think about them? - Mike Davis</p>
 
 </section>
 <section>
@@ -255,7 +260,7 @@
       { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
     ]
   };
-  var configOptions = {"dependencies":[{"src":"plugin/title-footer/title-footer.js","async":true,"callback":"function() { title_footer.initialize('github.com/dinshaw/promise','rgba(255,255,255,0.1)'); }"}]}
+  var configOptions = {"loop":false,"dependencies":[{"src":"plugin/title-footer/title-footer.js","async":true,"callback":"function() { title_footer.initialize('github.com/dinshaw/promise','rgba(255,255,255,0.1)'); }"}]}
   var initializeOptions = {};
   extend(initializeOptions, baseOptions);
   extend(initializeOptions, configOptions);
